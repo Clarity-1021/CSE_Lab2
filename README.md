@@ -100,3 +100,67 @@ release(int number){
 }
 ```
 
+# Exercise 4
+
+避免死锁：总是同时拿起左右两个筷子，在锁住左边筷子的时候如果左筷子空闲就锁住右筷子检查是否空闲，如果右筷子空闲，才拿起两只筷子开始吃饭，否则重新拿筷子。
+
+测试1：
+
+```bash
+Philosopher 1 424737118243400: Picked up left fork
+Philosopher 3 424737118499000: Picked up left fork
+Philosopher 3 424737118567600: Picked up right fork - eating
+Philosopher 1 424737118565200: Picked up right fork - eating
+Philosopher 1 424737187287100: Put down right fork
+Philosopher 1 424737187523900: Put down left fork
+Philosopher 1 424737187582800: Thinking
+Philosopher 5 424737187708300: Picked up left fork
+Philosopher 5 424737187753000: Picked up right fork - eating
+Philosopher 3 424737212591500: Put down right fork
+Philosopher 3 424737212682000: Put down left fork
+Philosopher 3 424737212721100: Thinking
+Philosopher 4 424737212748700: Picked up left fork
+Philosopher 4 424737212805100: Picked up right fork - eating
+Philosopher 5 424737259253900: Put down right fork
+Philosopher 5 424737260770200: Put down left fork
+Philosopher 5 424737260879400: Thinking
+Philosopher 2 424737261099500: Picked up left fork
+Philosopher 2 424737261173100: Picked up right fork - eating
+Philosopher 2 424737266953900: Put down right fork
+Philosopher 2 424737267320300: Put down left fork
+Philosopher 2 424737267526600: Thinking
+Philosopher 4 424737289963500: Put down right fork
+Philosopher 4 424737290440900: Put down left fork
+Philosopher 4 424737290604300: Thinking
+```
+
+测试2：
+
+```
+Philosopher 1 425254410540200: Picked up left fork
+Philosopher 1 425254411014100: Picked up right fork - eating
+Philosopher 3 425254418529500: Picked up left fork
+Philosopher 3 425254418624100: Picked up right fork - eating
+Philosopher 3 425254457008800: Put down right fork
+Philosopher 3 425254458219200: Put down left fork
+Philosopher 3 425254458272700: Thinking
+Philosopher 1 425254535625800: Put down right fork
+Philosopher 1 425254536137500: Put down left fork
+Philosopher 2 425254536155900: Picked up left fork
+Philosopher 2 425254536255800: Picked up right fork - eating
+Philosopher 1 425254536304700: Thinking
+Philosopher 4 425254536419300: Picked up left fork
+Philosopher 4 425254536465200: Picked up right fork - eating
+Philosopher 2 425254609302200: Put down right fork
+Philosopher 2 425254609381100: Put down left fork
+Philosopher 2 425254609915800: Thinking
+Philosopher 5 425254609919900: Picked up left fork
+Philosopher 5 425254609996900: Picked up right fork - eating
+Philosopher 4 425254619548500: Put down right fork
+Philosopher 4 425254619997500: Put down left fork
+Philosopher 4 425254621808300: Thinking
+Philosopher 5 425254641300700: Put down right fork
+Philosopher 5 425254641889700: Put down left fork
+Philosopher 5 425254641939100: Thinking
+```
+

@@ -20,8 +20,12 @@ public class Dining {
         }
 
         //开始吃饭
-        for (Thread t : threads) {
-            t.start();
+        for (int i = 0; i < threads.size(); i++) {
+            threads.get(i).start();
+            if (i == 0) {
+                //确保第一个哲学家已经拿起了左右两个筷子
+                threads.get(i).join(1000);
+            }
         }
     }
 }

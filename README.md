@@ -72,95 +72,95 @@ bar(P2)->bar(P1)->bar(V1)->bar(V2)->foo(P1)->foo(P2)->foo(V1)->foo(V2): x=3,y=3,
 ```java
 int free = U;
 # your variables
-int lock1 = 1;//同时只有一个线程有判断free是否非负的权利
-int lock2 = 1;//同时只有一个线程有修改free的权利
+sem lock1 = 1;//同时只有一个线程能改变共享变量free的值
+sem lock2 = free;//用来通知request有可用的资源
 
 # <await (free > 0) free = free - 1;>
 request(){
 	# your code
+    P(lock2);
     P(lock1);
-    if (free <= 0) {
-        V(lock1);
-        request();
-    }
-    else {
-		P(lock2);
-        free--;
-        V(lock2);
-        V(lock1);
-    }
+    free--;
+    V(lock1);
 }
 
 # <free = free + number;>
 release(int number){
 	# your code
-    P(lock2);
+    P(lock1);
     free = free + number;
-    V(lock2);
+    V(lock1);
+    while (int i = 0; i < number; i++) {
+        V(lock2);
+    }
 }
 ```
 
 # Exercise 4
 
-避免死锁：总是同时拿起左右两个筷子，在锁住左边筷子的时候如果左筷子空闲就锁住右筷子检查是否空闲，如果右筷子空闲，才拿起两只筷子开始吃饭，否则重新拿筷子。
+思路：总是同时拿起左右两个筷子，在锁住左边筷子的时候如果左筷子空闲就锁住右筷子检查是否空闲，如果右筷子空闲，才拿起两只筷子开始吃饭，否则重新拿筷子。
+
+可能产生死锁：如果所有哲学家都锁住自己的左筷子，检查到空闲，开始尝试锁住自己的右筷子，那么所有哲学家的右筷子此时都被自己右边的哲学家锁住，产生死锁。
+
+解决方法：确保第一个哲学家已经拿起了左右两只筷子，再让别的哲学家开始拿筷子吃饭。
 
 测试1：
 
 ```bash
-Philosopher 1 424737118243400: Picked up left fork
-Philosopher 3 424737118499000: Picked up left fork
-Philosopher 3 424737118567600: Picked up right fork - eating
-Philosopher 1 424737118565200: Picked up right fork - eating
-Philosopher 1 424737187287100: Put down right fork
-Philosopher 1 424737187523900: Put down left fork
-Philosopher 1 424737187582800: Thinking
-Philosopher 5 424737187708300: Picked up left fork
-Philosopher 5 424737187753000: Picked up right fork - eating
-Philosopher 3 424737212591500: Put down right fork
-Philosopher 3 424737212682000: Put down left fork
-Philosopher 3 424737212721100: Thinking
-Philosopher 4 424737212748700: Picked up left fork
-Philosopher 4 424737212805100: Picked up right fork - eating
-Philosopher 5 424737259253900: Put down right fork
-Philosopher 5 424737260770200: Put down left fork
-Philosopher 5 424737260879400: Thinking
-Philosopher 2 424737261099500: Picked up left fork
-Philosopher 2 424737261173100: Picked up right fork - eating
-Philosopher 2 424737266953900: Put down right fork
-Philosopher 2 424737267320300: Put down left fork
-Philosopher 2 424737267526600: Thinking
-Philosopher 4 424737289963500: Put down right fork
-Philosopher 4 424737290440900: Put down left fork
-Philosopher 4 424737290604300: Thinking
+Philosopher 1 4201489844400: Picked up left fork
+Philosopher 1 4201490216800: Picked up right fork - eating
+Philosopher 1 4201538422500: Put down right fork
+Philosopher 1 4201539047900: Put down left fork
+Philosopher 1 4201539132699: Thinking
+Philosopher 2 4201603835400: Picked up left fork
+Philosopher 4 4201604161999: Picked up left fork
+Philosopher 4 4201604336300: Picked up right fork - eating
+Philosopher 2 4201605255400: Picked up right fork - eating
+Philosopher 4 4201655405000: Put down right fork
+Philosopher 4 4201655483100: Put down left fork
+Philosopher 4 4201655517500: Thinking
+Philosopher 2 4201699358199: Put down right fork
+Philosopher 2 4201699710699: Put down left fork
+Philosopher 3 4201699772900: Picked up left fork
+Philosopher 3 4201699983300: Picked up right fork - eating
+Philosopher 2 4201700319100: Thinking
+Philosopher 5 4201700401400: Picked up left fork
+Philosopher 5 4201700456300: Picked up right fork - eating
+Philosopher 5 4201747692300: Put down right fork
+Philosopher 5 4201748300399: Put down left fork
+Philosopher 5 4201748512000: Thinking
+Philosopher 3 4201784272300: Put down right fork
+Philosopher 3 4201784362300: Put down left fork
+Philosopher 3 4201784401099: Thinking
 ```
 
 测试2：
 
-```
-Philosopher 1 425254410540200: Picked up left fork
-Philosopher 1 425254411014100: Picked up right fork - eating
-Philosopher 3 425254418529500: Picked up left fork
-Philosopher 3 425254418624100: Picked up right fork - eating
-Philosopher 3 425254457008800: Put down right fork
-Philosopher 3 425254458219200: Put down left fork
-Philosopher 3 425254458272700: Thinking
-Philosopher 1 425254535625800: Put down right fork
-Philosopher 1 425254536137500: Put down left fork
-Philosopher 2 425254536155900: Picked up left fork
-Philosopher 2 425254536255800: Picked up right fork - eating
-Philosopher 1 425254536304700: Thinking
-Philosopher 4 425254536419300: Picked up left fork
-Philosopher 4 425254536465200: Picked up right fork - eating
-Philosopher 2 425254609302200: Put down right fork
-Philosopher 2 425254609381100: Put down left fork
-Philosopher 2 425254609915800: Thinking
-Philosopher 5 425254609919900: Picked up left fork
-Philosopher 5 425254609996900: Picked up right fork - eating
-Philosopher 4 425254619548500: Put down right fork
-Philosopher 4 425254619997500: Put down left fork
-Philosopher 4 425254621808300: Thinking
-Philosopher 5 425254641300700: Put down right fork
-Philosopher 5 425254641889700: Put down left fork
-Philosopher 5 425254641939100: Thinking
+```bash
+Philosopher 1 4152846405700: Picked up left fork
+Philosopher 1 4152846778299: Picked up right fork - eating
+Philosopher 1 4152915336000: Put down right fork
+Philosopher 1 4152915642500: Put down left fork
+Philosopher 1 4152915747000: Thinking
+Philosopher 2 4153003988400: Picked up left fork
+Philosopher 2 4153005112799: Picked up right fork - eating
+Philosopher 4 4153005580299: Picked up left fork
+Philosopher 4 4153005783300: Picked up right fork - eating
+Philosopher 4 4153038698499: Put down right fork
+Philosopher 4 4153039000900: Put down left fork
+Philosopher 4 4153039187100: Thinking
+Philosopher 2 4153039377899: Put down right fork
+Philosopher 2 4153039815800: Put down left fork
+Philosopher 2 4153039868300: Thinking
+Philosopher 5 4153039893100: Picked up left fork
+Philosopher 5 4153039995600: Picked up right fork - eating
+Philosopher 3 4153040046299: Picked up left fork
+Philosopher 3 4153040158200: Picked up right fork - eating
+Philosopher 3 4153060186300: Put down right fork
+Philosopher 3 4153060264400: Put down left fork
+Philosopher 3 4153060312700: Thinking
+Philosopher 5 4153119115600: Put down right fork
+Philosopher 5 4153119400200: Put down left fork
+Philosopher 5 4153122347499: Thinking
 ```
 
